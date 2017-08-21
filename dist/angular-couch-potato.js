@@ -1,6 +1,6 @@
-/*! angular-couch-potato - v0.2.3 - 2014-11-06
+/*! angular-couch-potato - v0.2.3 - 2017-08-21
  * https://github.com/laurelnaiad/angular-couch-potato
- * Copyright (c) 2013 Daphne Maddox;
+ * Copyright (c) 2017 Daphne Maddox;
  *    Uses software code originally found at https://github.com/szhanginrhythm/angular-require-lazyload
  * Licensed MIT
  */
@@ -169,26 +169,35 @@
           var defer = $q.defer();
 
           require(dependencies, function() {
-            var args = Array.prototype.slice(arguments);
+            var definedDependencies = dependencies.map(function(dependency) {
+              if (dependency.indexOf('build') > 0) {
+                return dependency.slice(dependency.indexOf('/build/') + '/build/'.length, dependency.lastIndexOf('.') - 9);
+              }
 
-            var out;
+              return dependency;
+            });
 
-            if (returnIndex === undefined) {
-              out = arguments[arguments.length - 1];
-            }
-            else {
-              argForOut = arguments[returnIndex];
-              if (returnSubId === undefined) {
-                out = argForOut;
+            require(definedDependencies, function() {
+              var args = Array.prototype.slice(arguments);
+
+              var out;
+
+              if (returnIndex === undefined) {
+                out = arguments[arguments.length - 1];
               }
               else {
-                out = argForOut[returnSubId];
+                argForOut = arguments[returnIndex];
+                if (returnSubId === undefined) {
+                  out = argForOut;
+                }
+                else {
+                  out = argForOut[returnSubId];
+                }
               }
-            }
 
-            defer.resolve(out);
-            $rootScope.$apply();
-
+              defer.resolve(out);
+              $rootScope.$apply();
+            })
           });
 
           return defer.promise;
