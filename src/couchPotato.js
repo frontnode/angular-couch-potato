@@ -170,26 +170,35 @@
           var defer = $q.defer();
 
           require(dependencies, function() {
-            var args = Array.prototype.slice(arguments);
+            var definedDependencies = dependencies.map(function(dependency) {
+              if (dependency.indexOf('build') > 0) {
+                return dependency.slice(dependency.indexOf('/build/') + '/build/'.length, dependency.lastIndexOf('.') - 9);
+              }
 
-            var out;
+              return dependency;
+            });
 
-            if (returnIndex === undefined) {
-              out = arguments[arguments.length - 1];
-            }
-            else {
-              argForOut = arguments[returnIndex];
-              if (returnSubId === undefined) {
-                out = argForOut;
+            require(definedDependencies, function() {
+              var args = Array.prototype.slice(arguments);
+
+              var out;
+
+              if (returnIndex === undefined) {
+                out = arguments[arguments.length - 1];
               }
               else {
-                out = argForOut[returnSubId];
+                argForOut = arguments[returnIndex];
+                if (returnSubId === undefined) {
+                  out = argForOut;
+                }
+                else {
+                  out = argForOut[returnSubId];
+                }
               }
-            }
 
-            defer.resolve(out);
-            $rootScope.$apply();
-
+              defer.resolve(out);
+              $rootScope.$apply();
+            })
           });
 
           return defer.promise;

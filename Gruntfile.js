@@ -8,14 +8,14 @@ module.exports = function(grunt) {
   // grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  // grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-ngdocs');
   grunt.loadNpmTasks('grunt-gh-pages');
 
   // grunt.registerTask('bower', ['bowerTask', 'gruntBower']);
   grunt.registerTask('bower', ['bowerTask', 'gruntBower']);
   grunt.registerTask('default', ['build']);
-  grunt.registerTask('build', ['clean', 'bower', 'concat']);
+  grunt.registerTask('build', ['clean', 'bower', 'concat', 'uglify']);
   grunt.registerTask('release', ['build','copy:samples', 'ngdocs']);
   grunt.registerTask('docs', ['ngdocs']);
 
@@ -90,8 +90,14 @@ module.exports = function(grunt) {
           banner: '<%= banner %>',
           stripBanners: true
         },
-        src:['<%= dirs.src.js %>'],
-        dest:'<%= dirs.dist %>/<%= pkg.name %>.js'
+        src: ['<%= dirs.src.js %>'],
+        dest: '<%= dirs.dist %>/<%= pkg.name %>.js'
+      }
+    },
+    uglify: {
+      dist: {
+        src: '<%= dirs.dist %>/<%= pkg.name %>.js',
+        dest: '<%= dirs.dist %>/<%= pkg.name %>.min.js'
       }
     }
   });
